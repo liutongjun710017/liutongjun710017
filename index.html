@@ -5,640 +5,706 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>身份认证系统 - 联邦沙勒调查局</title>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:white;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
-        .container{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border-radius:15px;padding:30px;width:100%;max-width:500px;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.2)}
-        .header{text-align:center;margin-bottom:30px}
-        .header h1{font-size:24px;margin-bottom:8px;background:linear-gradient(45deg,#00b4db,#0083b0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-        .nfc-section{text-align:center;margin-bottom:20px;padding:15px;background:rgba(255,255,255,0.05);border-radius:10px;border:1px solid rgba(255,255,255,0.1)}
-        .nfc-button{background:linear-gradient(45deg,#00b4db,#0083b0);color:white;border:none;padding:12px 24px;border-radius:25px;font-size:16px;cursor:pointer;margin:10px 5px;transition:transform 0.2s}
-        .nfc-button:hover{transform:scale(1.05)}
-        .nfc-button:disabled{background:#666;cursor:not-allowed}
-        .nfc-status{font-size:14px;color:#ffa726;margin-top:10px;min-height:20px}
-        .status-item{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid rgba(255,255,255,0.1);font-size:16px}
-        .label{font-weight:bold;color:#cccccc}
-        .value{font-weight:bold}
-        .checking{color:#ffa726}
-        .checking::after{content:'...';animation:dots 1.5s infinite}
-        .verified{color:#4caf50;position:relative}
-        .verified::after{content:' ✓';color:#4caf50;font-weight:bold}
-        .unauthorized{color:#f44336;position:relative}
-        .unauthorized::after{content:' ✗';color:#f44336;font-weight:bold}
-        .loading-bar{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin:20px 0;overflow:hidden}
-        .loading-progress{height:100%;background:linear-gradient(90deg,#00b4db,#0083b0);border-radius:2px;width:0%;transition:width 0.5s ease}
-        @keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
-        .footer{text-align:center;margin-top:20px;font-size:12px;color:#888}
-        .card-info{background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-top:10px;font-size:12px;color:#ccc}
-        .card-id{color:#00b4db;font-family:monospace;background:rgba(0,180,219,0.1);padding:2px 6px;border-radius:4px}
-        .test-buttons{display:flex;gap:10px;justify-content:center;margin:10px 0;flex-wrap:wrap}
-        .test-button{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;padding:8px 12px;border-radius:5px;cursor:pointer;font-size:11px;flex:1;min-width:80px;max-width:120px}
-        .test-button:hover{background:rgba(255,255,255,0.2)}
-        .error-message{color:#ff6b6b;font-size:12px;margin-top:5px}
-        .manual-input{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:5px;padding:8px 10px;color:white;outline:none;transition:border-color 0.3s}
-        .manual-input:focus{border-color:#00b4db}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .lang-btn {
+            background: #4a69bd;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 5px;
+            transition: background 0.3s;
+        }
+        .lang-btn:hover { background: #3c5aa8; }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #4a69bd, #6a89cc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+        }
+        h1 {
+            color: #0c2461;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .card-title {
+            color: #1e3799;
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title i { font-size: 24px; }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #4a69bd;
+            outline: none;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, #4a69bd, #6a89cc);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: linear-gradient(to right, #3c5aa8, #5a7ac2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 105, 189, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(to right, #38ada9, #78e08f);
+        }
+        .btn-secondary:hover { background: linear-gradient(to right, #2d968f, #64d07a); }
+        .btn-danger {
+            background: linear-gradient(to right, #e55039, #eb8d6a);
+        }
+        .btn-danger:hover { background: linear-gradient(to right, #d44029, #e07d5a); }
+        .result-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 5px solid #4a69bd;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .result-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .result-value {
+            color: #0c2461;
+            font-weight: 500;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success { background: #38ada9; }
+        .status-warning { background: #f6b93b; }
+        .status-error { background: #e55039; }
+        .debug-panel {
+            background: #f1f2f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            border: 1px dashed #a4b0be;
+        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- 语言切换器 -->
+        <div class="language-switcher">
+            <button class="lang-btn" onclick="switchLanguage('en')">English</button>
+            <button class="lang-btn" onclick="switchLanguage('zh')">中文</button>
+        </div>
+
+        <!-- 页头 -->
         <div class="header">
-            <h1>🔐 身份认证系统</h1>
-            <p>联邦沙勒调查局 - 安全验证</p>
+            <div class="logo">FBI</div>
+            <h1>身份认证系统</h1>
+            <p class="subtitle">联邦沙勒调查局 - 安全验证</p>
         </div>
-        
-        <div class="nfc-section">
-            <div>请将NFC卡片靠近设备</div>
-            <button class="nfc-button" onclick="startNFCScan()" id="nfcButton">开始NFC扫描</button>
-            <div class="nfc-status" id="nfcStatus">等待扫描...</div>
-            <div id="nfcError" class="error-message"></div>
-            
-            <div class="test-buttons" id="testButtonsContainer">
-                <button class="test-button" onclick="testCard('se 710017')">Sensei卡</button>
-                <button class="test-button" onclick="testCard('xy 214412')">学生卡</button>
-                <button class="test-button" onclick="testCard('')">空白卡</button>
+
+        <!-- NFC 调试信息面板 -->
+        <div id="nfc-debug-panel" class="card" style="display: none;">
+            <div class="card-title">
+                <i>🔍</i> NFC 调试信息
             </div>
-            
-            <div class="card-info" id="cardInfo"></div>
+            <p><strong>状态：</strong><span id="nfc-status-text">等待开始</span></p>
+            <p><strong>浏览器：</strong><span id="browser-info-text">检测中...</span></p>
+            <p><strong>最后操作：</strong><span id="last-action-text">-</span></p>
+            <div id="detailed-error" style="color: #d32f2f; margin-top: 10px;"></div>
         </div>
-        
-        <div class="loading-bar">
-            <div class="loading-progress" id="loadingProgress"></div>
-        </div>
-        
-        <div id="statusDisplay">
-            <div class="status-item">
-                <span class="label">CAR ID：</span>
-                <span class="value checking" id="cardIdStatus">等待读取</span>
+
+        <!-- 主验证卡片 -->
+        <div class="card">
+            <div class="card-title">
+                <i>🆔</i> 身份信息
             </div>
-            
-            <div class="status-item">
-                <span class="label">ID卡号：</span>
-                <span class="value checking" id="idNumberStatus">等待读取</span>
-            </div>
-            
-            <div class="status-item">
-                <span class="label">姓名：</span>
-                <span class="value checking" id="nameStatus">等待NFC验证</span>
-            </div>
-            
-            <div class="status-item">
-                <span class="label">隶属：</span>
-                <span class="value checking" id="affiliationStatus">等待NFC验证</span>
-            </div>
-            
-            <div class="status-item">
-                <span class="label">权限等级：</span>
-                <span class="value checking" id="levelStatus">等待NFC验证</span>
-            </div>
-            
-            <div class="status-item">
-                <span class="label">区域认证：</span>
-                <span class="value checking" id="areaStatus">等待NFC验证</span>
-            </div>
-        </div>
-        
-        <!-- 管理员后台系统入口 -->
-        <div class="admin-verify" id="adminVerify" style="text-align:center; margin-top:25px;">
-            <button class="nfc-button" onclick="showAdminVerify()" style="background:linear-gradient(45deg,#ff9800,#f57c00);">
-                👨‍💼 管理员后台
-            </button>
-            <div style="font-size:11px; color:#888; margin-top:5px;">包含：手动测试、创建新卡、查看卡库</div>
-        </div>
-        
-        <!-- 管理员后台系统界面 (默认隐藏) -->
-        <div class="admin-section" id="adminSection" style="display:none; margin-top:20px; padding:20px; background:rgba(255,255,255,0.05); border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
-            <h3 style="text-align:center; margin-bottom:15px; color:#00b4db;">👨‍💼 管理员后台系统</h3>
-            
-            <!-- 手动测试面板 -->
-            <div style="margin-bottom:20px; padding:15px; background:rgba(255,255,255,0.03); border-radius:8px;">
-                <h4 style="color:#ccc; margin-bottom:10px;">🛠️ 手动测试卡片</h4>
-                <input type="text" class="manual-input" id="manualCardId" placeholder="输入卡号进行测试，如：se 710017" style="width:100%; margin-bottom:10px;">
-                <button class="nfc-button" onclick="manualTest()" style="width:100%; background:linear-gradient(45deg,#9c27b0,#6a1b9a);">执行手动验证</button>
-                <div id="manualTestStatus" style="margin-top:10px; font-size:12px;"></div>
-            </div>
-            
-            <!-- 已储存卡片列表 -->
-            <div style="margin-bottom:20px;">
-                <h4 style="color:#ccc; margin-bottom:10px;">📁 已储存的身份卡片</h4>
-                <div id="storedCardsList" style="background:rgba(0,0,0,0.2); padding:10px; border-radius:5px; max-height:200px; overflow-y:auto; font-size:12px; font-family:monospace; min-height:60px;">
-                    加载中...
+            <div class="form-group">
+                <label for="carId">CAR ID:</label>
+                <div class="result-display">
+                    <div class="result-item">
+                        <span class="result-label">CAR ID:</span>
+                        <span id="carIdDisplay" class="result-value">等待读取...</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">ID卡号:</span>
+                        <span id="cardNumberDisplay" class="result-value">N/A</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">姓名:</span>
+                        <span id="nameDisplay" class="result-value">未知用户</span>
+                    </div>
                 </div>
             </div>
             
-            <!-- 创建新卡片面板 -->
-            <div style="padding:15px; background:rgba(255,255,255,0.03); border-radius:8px;">
-                <h4 style="color:#ccc; margin-bottom:15px;">✨ 创建新学生档案</h4>
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">卡号 (将写入NFC标签):</label>
-                    <input type="text" class="manual-input" id="newCardId" placeholder="例如：STUDENT-002" style="font-size:14px;">
-                </div>
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">姓名:</label>
-                    <input type="text" class="manual-input" id="newName" placeholder="例如：学生B：true" style="font-size:14px;">
-                </div>
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">学院:</label>
-                    <input type="text" class="manual-input" id="newAffiliation" placeholder="例如：阿拜多斯高等学院：true" style="font-size:14px;">
-                </div>
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">权限等级:</label>
-                    <input type="text" class="manual-input" id="newLevel" placeholder="例如：R-Std：true" style="font-size:14px;">
-                </div>
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">区域认证:</label>
-                    <input type="text" class="manual-input" id="newArea" placeholder="例如：阿拜多斯" style="font-size:14px;">
-                </div>
-                <div style="margin-bottom:15px;">
-                    <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">ID卡号:</label>
-                    <input type="text" class="manual-input" id="newIdNumber" placeholder="例如：ABXY-002" style="font-size:14px;">
-                </div>
-                <button class="nfc-button" onclick="saveNewCard()" style="background:linear-gradient(45deg,#4caf50,#2e7d32); width:100%;">
-                    💾 保存新学生档案
+            <div style="text-align: center; margin-top: 25px;">
+                <button id="startNFCBtn" class="btn" onclick="startEdgeCompatibleScan()" 
+                        style="padding: 18px 40px; font-size: 18px;">
+                    📱 开始NFC扫描
                 </button>
-                <div id="saveStatus" style="margin-top:10px; font-size:12px;"></div>
-            </div>
-            
-            <div style="text-align:center; margin-top:15px;">
-                <button class="nfc-button" onclick="exitAdminMode()" style="background:linear-gradient(45deg,#757575,#424242); font-size:14px; padding:8px 20px;">
-                    ⬅ 退出管理员模式
+                <button class="btn btn-secondary" onclick="showAdminPanel()" 
+                        style="margin-left: 15px; padding: 18px 30px; font-size: 18px;">
+                    🔧 管理员后台
                 </button>
             </div>
         </div>
-        
-        <div class="footer">
-            <p>最后更新: <span id="timestamp"></span></p>
+
+        <!-- 管理员面板 (默认隐藏) -->
+        <div id="adminPanel" class="card hidden">
+            <div class="card-title">
+                <i>⚙️</i> 管理员后台
+            </div>
+            <div class="form-group">
+                <label>管理员密钥验证</label>
+                <input type="password" id="adminKeyInput" placeholder="扫描管理员密钥NFC标签或输入密钥">
+                <button class="btn btn-secondary" onclick="verifyAdminKey()" style="margin-top: 10px;">验证密钥</button>
+            </div>
+            
+            <div id="adminFunctions" style="display: none;">
+                <div class="card" style="background: #f8f9fa;">
+                    <div class="card-title"><i>📋</i> 已储存卡片列表</div>
+                    <div id="storedCardsList"></div>
+                </div>
+                
+                <div class="card" style="background: #f8f9fa; margin-top: 20px;">
+                    <div class="card-title"><i>🆕</i> 创建新卡片</div>
+                    <div class="form-group">
+                        <label>卡号 (格式: xy 214412):</label>
+                        <input type="text" id="newCardNumber" placeholder="例如: xy 214412">
+                    </div>
+                    <div class="form-group">
+                        <label>持卡人姓名:</label>
+                        <input type="text" id="newCardName" placeholder="例如: 学生">
+                    </div>
+                    <div class="form-group">
+                        <label>卡片类型:</label>
+                        <select id="newCardType">
+                            <option value="student">学生卡</option>
+                            <option value="sensei">Sensei卡</option>
+                            <option value="admin">管理员密钥卡</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="createNewCard()">创建新卡片</button>
+                    <button class="btn btn-secondary" onclick="writeToNFCTag()" style="margin-left: 10px;">写入NFC标签</button>
+                </div>
+                
+                <div class="card" style="background: #f8f9fa; margin-top: 20px;">
+                    <div class="card-title"><i>🧪</i> 手动测试</div>
+                    <div class="form-group">
+                        <label>手动输入卡号测试:</label>
+                        <input type="text" id="manualCardInput" placeholder="输入卡号进行测试">
+                    </div>
+                    <button class="btn" onclick="manualTestCard()">测试验证</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 物理卡片提示区域（替代原来的模拟卡片区域） -->
+        <div class="card">
+            <div class="card-title">
+                <i>💳</i> 使用说明
+            </div>
+            <div style="text-align: center; padding: 20px;">
+                <p style="margin-bottom: 15px; font-size: 16px;">
+                    <strong>⚠️ 本系统仅支持物理NFC卡片验证</strong>
+                </p>
+                <p style="color: #666; margin-bottom: 10px;">
+                    1. 请确保使用支持NFC的Android设备<br>
+                    2. 点击"开始NFC扫描"按钮授权NFC权限<br>
+                    3. 将物理NFC卡片贴近设备背面进行验证<br>
+                    4. 系统不支持模拟卡片或点击验证
+                </p>
+                <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; margin-top: 15px;">
+                    <p style="color: #0c2461; margin: 0;">
+                        <strong>支持的卡片类型：</strong><br>
+                        • Sensei卡 (se 710017)<br>
+                        • 学生卡 (xy 214412)<br>
+                        • 管理员密钥卡
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // 更新时间戳
-        document.getElementById('timestamp').textContent = new Date().toLocaleString('zh-CN');
-        
-        // ==================== NFC卡片数据库 ====================
-        const nfcCards = {
-            "se 710017": {
-                name: 'Sensei',
-                affiliation: '联邦沙勒调查局',
-                level: 'WTR',
-                area: '阿拜多斯',
-                idNumber: 'SE-710017',
-                type: '官方认证'
-            },
-            "xy 214412": {
-                name: '小鸟游星原：true',
-                affiliation: '阿拜多斯高等学院：true',
-                level: 'R-Std：true',
-                area: '阿拜多斯',
-                idNumber: 'xy 214412',
-                type: '学生认证'
+        // 全局变量
+        let nfcReader = null;
+        let isScanning = false;
+        let currentLanguage = 'zh';
+        let storedCards = {
+            "se 710017": { name: "Sensei", type: "sensei", fullNumber: "se 710017" },
+            "xy 214412": { name: "学生", type: "student", fullNumber: "xy 214412" },
+            "ADM-001710017ndbhcihbsnvdhdbscjsbsbsbjdhdcnsbbkbhdbjxvnsshjfsbbevdjhdbwkbwgdugdkeb": { 
+                name: "管理员密钥", 
+                type: "admin", 
+                fullNumber: "ADM-001710017ndbhcihbsnvdhdbscjsbsbsbjdhdcnsbbkbhdbjxvnsshjfsbbevdjhdbwkbwgdugdkeb"
             }
         };
-        
-        // ==================== 管理员验证系统 ====================
-        const ADMIN_KEY = "ADM-001710017ndbhcihbsnvdhdbscjsbsbsbjdhdcnsbbkbhdbjxvnsshjfsbbevdjhdbwkbwgdugdkeb";
-        let isAdminVerified = false;
-        let adminNdefReader = null;
-        const loadingProgress = document.getElementById('loadingProgress');
-        let ndefReader = null;
-        
-        // 初始化测试按钮
-        function initializeTestButtons() {
-            const testButtonsContainer = document.getElementById('testButtonsContainer');
-            // 只显示非管理员卡片的测试按钮
-            Object.keys(nfcCards).forEach(cardId => {
-                if (cardId !== ADMIN_KEY) {
-                    const button = document.createElement('button');
-                    button.className = 'test-button';
-                    button.textContent = cardId.length > 8 ? cardId.substring(0, 8) + '...' : cardId;
-                    button.title = cardId;
-                    button.onclick = function() { 
-                        testCard(cardId);
-                    };
-                    // 插入到空白卡按钮之前
-                    const blankBtn = testButtonsContainer.querySelector('.test-button[onclick*="testCard(\'\')"]');
-                    if(blankBtn) {
-                        testButtonsContainer.insertBefore(button, blankBtn);
-                    } else {
-                        testButtonsContainer.appendChild(button);
+
+        // 语言切换
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            const texts = {
+                zh: {
+                    title: "身份认证系统",
+                    subtitle: "联邦沙勒调查局 - 安全验证",
+                    startScan: "📱 开始NFC扫描",
+                    adminPanel: "🔧 管理员后台",
+                    carId: "CAR ID:",
+                    cardNumber: "ID卡号:",
+                    name: "姓名:",
+                    waiting: "等待读取...",
+                    unknown: "未知用户",
+                    instructionsTitle: "使用说明",
+                    instructionsText: "本系统仅支持物理NFC卡片验证",
+                    instructionsList1: "1. 请确保使用支持NFC的Android设备",
+                    instructionsList2: "2. 点击\"开始NFC扫描\"按钮授权NFC权限",
+                    instructionsList3: "3. 将物理NFC卡片贴近设备背面进行验证",
+                    instructionsList4: "4. 系统不支持模拟卡片或点击验证",
+                    supportedCards: "支持的卡片类型："
+                },
+                en: {
+                    title: "Identity Authentication System",
+                    subtitle: "Federal Bureau of Investigation - Secure Verification",
+                    startScan: "📱 Start NFC Scan",
+                    adminPanel: "🔧 Admin Panel",
+                    carId: "CAR ID:",
+                    cardNumber: "Card Number:",
+                    name: "Name:",
+                    waiting: "Waiting for read...",
+                    unknown: "Unknown User",
+                    instructionsTitle: "Instructions",
+                    instructionsText: "This system only supports physical NFC card verification",
+                    instructionsList1: "1. Please use an Android device with NFC support",
+                    instructionsList2: "2. Click \"Start NFC Scan\" button to authorize NFC permission",
+                    instructionsList3: "3. Place the physical NFC card close to the back of the device",
+                    instructionsList4: "4. The system does not support simulated cards or click verification",
+                    supportedCards: "Supported Card Types:"
+                }
+            };
+            
+            const t = texts[lang];
+            document.querySelector('h1').textContent = t.title;
+            document.querySelector('.subtitle').textContent = t.subtitle;
+            document.getElementById('startNFCBtn').textContent = t.startScan;
+            document.querySelector('button[onclick="showAdminPanel()"]').textContent = t.adminPanel;
+            document.querySelectorAll('.result-item')[0].querySelector('.result-label').textContent = t.carId;
+            document.querySelectorAll('.result-item')[1].querySelector('.result-label').textContent = t.cardNumber;
+            document.querySelectorAll('.result-item')[2].querySelector('.result-label').textContent = t.name;
+            
+            // 更新使用说明区域
+            const instructionsCard = document.querySelector('.card:last-child .card-title');
+            if (instructionsCard) {
+                instructionsCard.innerHTML = `<i>💳</i> ${t.instructionsTitle}`;
+                const instructionsContent = document.querySelector('.card:last-child div[style*="text-align: center"]');
+                if (instructionsContent) {
+                    const paragraphs = instructionsContent.querySelectorAll('p');
+                    if (paragraphs[0]) paragraphs[0].innerHTML = `<strong>⚠️ ${t.instructionsText}</strong>`;
+                    if (paragraphs[1]) paragraphs[1].innerHTML = `
+                        ${t.instructionsList1}<br>
+                        ${t.instructionsList2}<br>
+                        ${t.instructionsList3}<br>
+                        ${t.instructionsList4}
+                    `;
+                    const supportedCardsDiv = instructionsContent.querySelector('div[style*="background: #f8f9fa"]');
+                    if (supportedCardsDiv && supportedCardsDiv.querySelector('p')) {
+                        supportedCardsDiv.querySelector('p').innerHTML = `<strong>${t.supportedCards}</strong><br>
+                        • Sensei卡 (se 710017)<br>
+                        • 学生卡 (xy 214412)<br>
+                        • 管理员密钥卡`;
                     }
                 }
-            });
+            }
+            
+            if(document.getElementById('carIdDisplay').textContent === '等待读取...') {
+                document.getElementById('carIdDisplay').textContent = t.waiting;
+            }
+            if(document.getElementById('nameDisplay').textContent === '未知用户') {
+                document.getElementById('nameDisplay').textContent = t.unknown;
+            }
         }
-        
+
+        // === 核心修复：Edge兼容的NFC扫描函数 ===
+        async function startEdgeCompatibleScan() {
+            const statusEl = document.getElementById('nfc-status-text');
+            const browserInfoEl = document.getElementById('browser-info-text');
+            const lastActionEl = document.getElementById('last-action-text');
+            const errorEl = document.getElementById('detailed-error');
+            const debugPanel = document.getElementById('nfc-debug-panel');
+            
+            // 显示调试面板
+            debugPanel.style.display = 'block';
+            errorEl.innerHTML = '';
+            statusEl.textContent = '正在初始化...';
+            lastActionEl.textContent = `开始请求 NFC 权限`;
+            
+            // 检测浏览器和系统
+            const ua = navigator.userAgent;
+            const isEdge = ua.includes('Edg');
+            const isAndroid = ua.includes('Android');
+            const isChrome = ua.includes('Chrome') && !ua.includes('Edg');
+            
+            let browserInfo = '';
+            if (isEdge) {
+                const edgeVersion = ua.match(/Edg\/(\d+)/);
+                browserInfo = `Microsoft Edge (${edgeVersion ? edgeVersion[1] : '?'})`;
+            } else if (isChrome) {
+                browserInfo = 'Google Chrome';
+            } else {
+                browserInfo = '其他浏览器';
+            }
+            browserInfoEl.textContent = `${browserInfo} | ${isAndroid ? 'Android' : '非Android'}`;
+            
+            // 1. 检查浏览器是否支持 Web NFC
+            if (!('NDEFReader' in window)) {
+                const msg = '❌ 您的浏览器不支持 Web NFC API。<br>请使用 Android 设备的 Edge 或 Chrome 浏览器访问此页面。';
+                statusEl.innerHTML = msg;
+                errorEl.innerHTML = `<p>${msg}</p><p>用户代理: ${ua}</p>`;
+                return;
+            }
+            
+            // 2. 检查是否在 HTTPS 或 localhost
+            if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+                const msg = '⚠️ Web NFC 需要 HTTPS 安全连接。<br>你的 GitHub Pages 已自动使用 HTTPS，请检查地址栏是否有 🔒 图标。';
+                statusEl.innerHTML = msg;
+                return;
+            }
+            
+            try {
+                // 3. 创建或复用 NDEFReader 实例（关键！避免重复请求权限）
+                if (!nfcReader) {
+                    console.log("创建新的 NDEFReader 实例...");
+                    nfcReader = new NDEFReader();
+                    
+                    // 定义读取到卡片后的处理逻辑
+                    nfcReader.onreading = (event) => {
+                        console.log("✅ NFC 读取成功！", event);
+                        lastActionEl.textContent = `卡片读取成功 ${new Date().toLocaleTimeString()}`;
+                        handleNFCMessage(event);
+                    };
+                    
+                    nfcReader.onreadingerror = (err) => {
+                        console.warn("读取错误：", err);
+                        lastActionEl.textContent = `读取错误 ${new Date().toLocaleTimeString()}`;
+                        statusEl.textContent = '❌ 读取失败，请重新尝试';
+                    };
+                }
+                
+                // 4. 开始扫描（这会触发系统权限弹窗）
+                statusEl.textContent = '请在弹出的系统对话框中点击"允许"...';
+                lastActionEl.textContent = `调用 scan() 方法 ${new Date().toLocaleTimeString()}`;
+                
+                // 重要：Edge/Chrome 需要明确的用户手势，这里已经有了（按钮点击）
+                await nfcReader.scan();
+                
+                // 5. 如果执行到这里，说明用户已授予权限
+                isScanning = true;
+                statusEl.innerHTML = '✅ <strong>扫描已开始！</strong> 请将卡片贴近设备背面。';
+                lastActionEl.textContent = `权限已授予，扫描进行中 ${new Date().toLocaleTimeString()}`;
+                
+                // 6. 30秒后自动停止扫描，避免持续占用
+                setTimeout(async () => {
+                    if (nfcReader && isScanning) {
+                        try {
+                            await nfcReader.stop();
+                            isScanning = false;
+                            statusEl.innerHTML = '⏹️ <strong>扫描已自动停止</strong>，如需再次扫描请点击按钮。';
+                            lastActionEl.textContent = `自动停止扫描 ${new Date().toLocaleTimeString()}`;
+                        } catch (e) { 
+                            console.log("停止扫描时的小错误:", e);
+                        }
+                    }
+                }, 30000);
+                
+            } catch (error) {
+                console.error("NFC 扫描失败：", error);
+                isScanning = false;
+                statusEl.innerHTML = '❌ <strong>扫描启动失败</strong>';
+                lastActionEl.textContent = `捕获到异常 ${new Date().toLocaleTimeString()}`;
+                
+                // 给用户看的友好错误提示
+                let userFriendlyMsg = '';
+                if (error.name === 'NotAllowedError') {
+                    userFriendlyMsg = `权限请求被拒绝。<br><strong>请刷新页面后重试，并在系统弹出的对话框中点击"允许"。</strong><br><br>
+                    如果问题依旧，请在浏览器设置中检查此网站的NFC权限：<br>
+                    1. 点击地址栏左侧的 🔒 或 ⓘ 图标<br>
+                    2. 选择"网站设置"或"权限"<br>
+                    3. 找到"NFC"选项并设置为"允许"`;
+                } else if (error.name === 'NotSupportedError') {
+                    userFriendlyMsg = `设备不支持NFC功能。<br>请确保：<br>
+                    1. 使用 Android 手机<br>
+                    2. 手机系统已开启NFC功能<br>
+                    3. 使用 Edge 或 Chrome 浏览器`;
+                } else if (error.message.includes('User cancelled')) {
+                    userFriendlyMsg = '您取消了权限请求。';
+                } else {
+                    userFriendlyMsg = `错误: ${error.message || error.name}`;
+                }
+                
+                errorEl.innerHTML = `<p>${userFriendlyMsg}</p><p>错误详情: ${error.name}</p>`;
+            }
+        }
+
+        // 处理NFC读取到的消息
+        function handleNFCMessage(event) {
+            const decoder = new TextDecoder();
+            for (const record of event.message.records) {
+                if (record.recordType === "text") {
+                    const textData = decoder.decode(record.data);
+                    console.log("读取到文本数据:", textData);
+                    processCardData(textData.trim());
+                    
+                    // 读取成功后自动停止扫描
+                    if (nfcReader && isScanning) {
+                        nfcReader.stop().catch(() => {});
+                        isScanning = false;
+                        document.getElementById('nfc-status-text').textContent = '✅ 读取完成，扫描已停止';
+                    }
+                    break;
+                }
+            }
+        }
+
+        // 处理卡片数据
+        function processCardData(cardData) {
+            console.log("处理卡片数据:", cardData);
+            
+            // 更新显示
+            document.getElementById('carIdDisplay').textContent = "已验证";
+            
+            // 检查是否为管理员密钥（长字符串）
+            if (cardData.length > 50) {
+                document.getElementById('cardNumberDisplay').textContent = "*** (管理员密钥)";
+                document.getElementById('nameDisplay').textContent = "管理员";
+                return;
+            }
+            
+            // 普通卡片处理
+            const cardInfo = storedCards[cardData];
+            if (cardInfo) {
+                // 前台普通验证：隐藏完整卡号
+                document.getElementById('cardNumberDisplay').textContent = "***";
+                document.getElementById('nameDisplay').textContent = cardInfo.name;
+            } else {
+                document.getElementById('cardNumberDisplay').textContent = "未知卡号";
+                document.getElementById('nameDisplay').textContent = "未注册用户";
+            }
+            
+            // 如果正在显示管理员后台，则显示完整信息
+            if (document.getElementById('adminFunctions').style.display !== 'none') {
+                document.getElementById('cardNumberDisplay').textContent = cardData;
+                if (cardInfo) {
+                    document.getElementById('nameDisplay').textContent = `${cardInfo.name} (${cardInfo.type})`;
+                }
+            }
+        }
+
+        // 显示管理员面板
+        function showAdminPanel() {
+            document.getElementById('adminPanel').classList.remove('hidden');
+        }
+
+        // 验证管理员密钥
+        function verifyAdminKey() {
+            const inputKey = document.getElementById('adminKeyInput').value.trim();
+            const adminKey = "ADM-001710017ndbhcihbsnvdhdbscjsbsbsbjdhdcnsbbkbhdbjxvnsshjfsbbevdjhdbwkbwgdugdkeb";
+            
+            if (inputKey === adminKey) {
+                document.getElementById('adminFunctions').style.display = 'block';
+                updateStoredCardsList();
+                alert("✅ 管理员权限验证成功！");
+            } else {
+                alert("❌ 管理员密钥错误！");
+            }
+        }
+
+        // 更新已储存卡片列表
+        function updateStoredCardsList() {
+            const listEl = document.getElementById('storedCardsList');
+            listEl.innerHTML = '';
+            
+            for (const [cardNumber, cardInfo] of Object.entries(storedCards)) {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'result-item';
+                cardDiv.innerHTML = `
+                    <div>
+                        <strong>${cardInfo.name}</strong><br>
+                        <small>卡号: ${cardNumber}</small>
+                    </div>
+                    <div>
+                        <span class="status-indicator ${cardInfo.type === 'admin' ? 'status-error' : 'status-success'}"></span>
+                        ${cardInfo.type}
+                    </div>
+                `;
+                listEl.appendChild(cardDiv);
+            }
+        }
+
+        // 创建新卡片
+        function createNewCard() {
+            const cardNumber = document.getElementById('newCardNumber').value.trim();
+            const cardName = document.getElementById('newCardName').value.trim();
+            const cardType = document.getElementById('newCardType').value;
+            
+            if (!cardNumber || !cardName) {
+                alert("请输入卡号和姓名！");
+                return;
+            }
+            
+            storedCards[cardNumber] = {
+                name: cardName,
+                type: cardType,
+                fullNumber: cardNumber
+            };
+            
+            updateStoredCardsList();
+            document.getElementById('newCardNumber').value = '';
+            document.getElementById('newCardName').value = '';
+            alert(`✅ 卡片创建成功: ${cardName} (${cardNumber})`);
+        }
+
+        // 写入NFC标签
+        async function writeToNFCTag() {
+            const cardNumber = document.getElementById('newCardNumber').value.trim();
+            
+            if (!cardNumber) {
+                alert("请先输入要写入的卡号！");
+                return;
+            }
+            
+            if (!('NDEFReader' in window)) {
+                alert("浏览器不支持NFC写入功能");
+                return;
+            }
+            
+            try {
+                const ndef = new NDEFReader();
+                await ndef.write({
+                    records: [{ recordType: "text", data: cardNumber }]
+                });
+                alert(`✅ NFC标签写入成功: ${cardNumber}`);
+            } catch (error) {
+                console.error("写入失败:", error);
+                alert(`❌ NFC标签写入失败: ${error.message}`);
+            }
+        }
+
+        // 手动测试卡片（管理员后台功能）
+        function manualTestCard() {
+            const cardNumber = document.getElementById('manualCardInput').value.trim();
+            if (cardNumber) {
+                processCardData(cardNumber);
+                document.getElementById('nfc-status-text').textContent = '✅ 手动测试完成';
+            } else {
+                alert("请输入卡号进行测试");
+            }
+        }
+
         // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeTestButtons();
-            displayStoredCards(); // 初始化显示已储存卡片
+        window.addEventListener('load', function() {
+            console.log("身份认证系统加载完成");
+            // 默认显示中文界面
+            switchLanguage('zh');
+            
+            // 初始化NFC调试面板
+            const debugPanel = document.getElementById('nfc-debug-panel');
+            const ua = navigator.userAgent;
+            const isEdge = ua.includes('Edg');
+            document.getElementById('browser-info-text').textContent = 
+                isEdge ? 'Microsoft Edge' : 'Chrome/其他浏览器';
         });
-        
-        // ==================== 管理员后台功能 ====================
-        // 显示管理员验证界面
-        function showAdminVerify() {
-            const nfcStatus = document.getElementById('nfcStatus');
-            const cardInfo = document.getElementById('cardInfo');
-            
-            nfcStatus.textContent = '请扫描管理员密钥卡片...';
-            nfcStatus.style.color = '#ff9800';
-            cardInfo.innerHTML = '需要验证管理员权限<br>请将管理员密钥NFC标签靠近设备';
-            cardInfo.style.color = '#ff9800';
-            
-            stopNFCScan();
-            startAdminNFCScan();
-        }
-        
-        // 管理员NFC扫描
-        async function startAdminNFCScan() {
-            const nfcButton = document.getElementById('nfcButton');
-            const nfcError = document.getElementById('nfcError');
-            
-            if (!('NDEFReader' in window)) {
-                nfcError.textContent = '此浏览器不支持NFC功能';
-                return;
-            }
-            try {
-                nfcButton.disabled = true;
-                adminNdefReader = new NDEFReader();
-                await adminNdefReader.scan();
-                
-                adminNdefReader.onreading = event => {
-                    const decoder = new TextDecoder();
-                    let cardId = '';
-                    for (const record of event.message.records) {
-                        if (record.recordType === "text") {
-                            cardId = decoder.decode(record.data);
-                            break;
-                        }
-                    }
-                    
-                    if (cardId === ADMIN_KEY) {
-                        adminVerifiedSuccess();
-                    } else {
-                        adminVerificationFailed();
-                    }
-                    
-                    if (adminNdefReader) {
-                        adminNdefReader.onreading = null;
-                    }
-                };
-                
-                adminNdefReader.onreadingerror = () => {
-                    nfcError.textContent = '读取失败，请重试';
-                    nfcButton.disabled = false;
-                };
-                
-            } catch (error) {
-                nfcError.textContent = 'NFC扫描失败: ' + error.message;
-                nfcButton.disabled = false;
-            }
-        }
-        
-        // 管理员验证成功
-        function adminVerifiedSuccess() {
-            isAdminVerified = true;
-            
-            const nfcStatus = document.getElementById('nfcStatus');
-            const cardInfo = document.getElementById('cardInfo');
-            const nfcButton = document.getElementById('nfcButton');
-            
-            nfcStatus.textContent = '✅ 管理员验证成功';
-            nfcStatus.style.color = '#4caf50';
-            cardInfo.innerHTML = '管理员后台已解锁';
-            cardInfo.style.color = '#4caf50';
-            nfcButton.disabled = false;
-            
-            // 显示管理员后台界面
-            document.getElementById('adminSection').style.display = 'block';
-            document.getElementById('adminVerify').style.display = 'none';
-            
-            // 加载已储存卡片列表
-            displayStoredCards();
-            
-            // 自动填充示例数据
-            const nextNum = Object.keys(nfcCards).length + 100;
-            document.getElementById('newCardId').value = 'STUDENT-' + nextNum;
-            document.getElementById('newName').value = '新学生：true';
-            document.getElementById('newAffiliation').value = '阿拜多斯高等学院：true';
-            document.getElementById('newLevel').value = 'R-Std：true';
-            document.getElementById('newArea').value = '阿拜多斯';
-            document.getElementById('newIdNumber').value = 'ABXY-' + nextNum;
-        }
-        
-        // 显示已储存卡片列表
-        function displayStoredCards() {
-            const listContainer = document.getElementById('storedCardsList');
-            if (!listContainer) return;
-            
-            let html = '';
-            for (const [cardId, cardData] of Object.entries(nfcCards)) {
-                // 跳过管理员密钥本身
-                if (cardId === ADMIN_KEY) continue;
-                html += `<div style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px dashed rgba(255,255,255,0.1);">
-                    <strong style="color:#00b4db">卡号:</strong> ${cardId}<br>
-                    <strong>姓名:</strong> ${cardData.name}<br>
-                    <strong>ID卡号:</strong> ${cardData.idNumber}
-                </div>`;
-            }
-            listContainer.innerHTML = html || '<div style="color:#888; text-align:center; padding:20px;">暂无已储存的卡片</div>';
-        }
-        
-        // 管理员验证失败
-        function adminVerificationFailed() {
-            const nfcStatus = document.getElementById('nfcStatus');
-            const cardInfo = document.getElementById('cardInfo');
-            const nfcButton = document.getElementById('nfcButton');
-            
-            nfcStatus.textContent = '❌ 管理员验证失败';
-            nfcStatus.style.color = '#f44336';
-            cardInfo.innerHTML = '非管理员密钥<br>请使用正确的管理员密钥卡片';
-            cardInfo.style.color = '#f44336';
-            nfcButton.disabled = false;
-            
-            setTimeout(() => {
-                resetAllStatus();
-            }, 3000);
-        }
-        
-        // 退出管理员模式
-        function exitAdminMode() {
-            isAdminVerified = false;
-            document.getElementById('adminSection').style.display = 'none';
-            document.getElementById('adminVerify').style.display = 'block';
-            resetAllStatus();
-        }
-        
-        // 手动测试（管理员后台专用）
-        function manualTest() {
-            const cardId = document.getElementById('manualCardId').value.trim();
-            if (!cardId) { 
-                document.getElementById('manualTestStatus').innerHTML = '<span style="color:#ff9800">请输入卡号</span>';
-                return; 
-            }
-            processNFCCard(cardId);
-            document.getElementById('manualTestStatus').innerHTML = `<span style="color:#4caf50">正在测试卡号: ${cardId}</span>`;
-        }
-        
-        // 保存新学生档案
-        function saveNewCard() {
-            if (!isAdminVerified) {
-                alert('请先验证管理员权限！');
-                return;
-            }
-            const newCardId = document.getElementById('newCardId').value.trim();
-            const newName = document.getElementById('newName').value.trim();
-            const newAffiliation = document.getElementById('newAffiliation').value.trim();
-            const newLevel = document.getElementById('newLevel').value.trim();
-            const newArea = document.getElementById('newArea').value.trim();
-            const newIdNumber = document.getElementById('newIdNumber').value.trim();
-            
-            // 验证输入
-            if (!newCardId || !newName || !newAffiliation || !newLevel || !newArea || !newIdNumber) {
-                alert('请填写所有字段！');
-                return;
-            }
-            if (nfcCards[newCardId]) {
-                alert('此卡号已存在！');
-                return;
-            }
-            
-            // 添加到数据库
-            nfcCards[newCardId] = {
-                name: newName,
-                affiliation: newAffiliation,
-                level: newLevel,
-                area: newArea,
-                idNumber: newIdNumber,
-                type: '学生认证'
-            };
-            
-            // 显示成功信息
-            const saveStatus = document.getElementById('saveStatus');
-            saveStatus.innerHTML = `<div style="color:#4caf50; padding:10px; background:rgba(76,175,80,0.1); border-radius:5px;">
-                ✅ <strong>新档案已保存！</strong><br>
-                卡号: <span class="card-id">${newCardId}</span><br>
-                请将此卡号写入NFC标签。
-            </div>`;
-            
-            // 更新测试按钮和列表
-            updateTestButtons(newCardId);
-            displayStoredCards();
-            
-            // 自动填充下一个卡号
-            const nextNum = Object.keys(nfcCards).length + 100;
-            document.getElementById('newCardId').value = 'STUDENT-' + nextNum;
-            document.getElementById('newName').value = '';
-            document.getElementById('newAffiliation').value = '';
-            document.getElementById('newLevel').value = '';
-            document.getElementById('newArea').value = '';
-            document.getElementById('newIdNumber').value = 'ABXY-' + nextNum;
-            
-            setTimeout(() => {
-                saveStatus.innerHTML = '';
-            }, 5000);
-        }
-        
-        // 更新测试按钮
-        function updateTestButtons(newCardId) {
-            const testButtonsContainer = document.getElementById('testButtonsContainer');
-            
-            const newButton = document.createElement('button');
-            newButton.className = 'test-button';
-            newButton.textContent = newCardId.length > 8 ? newCardId.substring(0, 8) + '...' : newCardId;
-            newButton.title = newCardId;
-            newButton.onclick = function() { 
-                testCard(newCardId);
-            };
-            
-            const buttons = testButtonsContainer.querySelectorAll('.test-button');
-            const blankButton = Array.from(buttons).find(btn => btn.textContent.includes('空白卡'));
-            if (blankButton) {
-                testButtonsContainer.insertBefore(newButton, blankButton);
-            } else {
-                testButtonsContainer.appendChild(newButton);
-            }
-        }
-        
-        // ==================== NFC核心功能 ====================
-        // NFC扫描函数
-        async function startNFCScan() {
-            const nfcStatus = document.getElementById('nfcStatus');
-            const nfcButton = document.getElementById('nfcButton');
-            const nfcError = document.getElementById('nfcError');
-            
-            if (!('NDEFReader' in window)) {
-                nfcStatus.textContent = '❌ 此浏览器不支持Web NFC API';
-                nfcError.textContent = '请使用 Chrome for Android 或其他支持Web NFC的浏览器';
-                return;
-            }
-            try {
-                nfcButton.disabled = true;
-                nfcStatus.textContent = '请将卡片靠近设备...';
-                nfcError.textContent = '';
-                ndefReader = new NDEFReader();
-                await ndefReader.scan();
-                nfcStatus.textContent = '扫描中...将卡片靠近设备';
-                
-                ndefReader.onreading = event => {
-                    const decoder = new TextDecoder();
-                    let cardId = '';
-                    for (const record of event.message.records) {
-                        if (record.recordType === "text") {
-                            cardId = decoder.decode(record.data);
-                            break;
-                        }
-                    }
-                    nfcStatus.textContent = `读取到卡片数据`;
-                    processNFCCard(cardId);
-                };
-                ndefReader.onreadingerror = event => {
-                    nfcStatus.textContent = '❌ 读取卡片失败';
-                    nfcError.textContent = '请重新尝试靠近卡片';
-                    nfcButton.disabled = false;
-                };
-            } catch (error) {
-                nfcStatus.textContent = '❌ NFC扫描启动失败';
-                nfcError.textContent = error.message;
-                nfcButton.disabled = false;
-            }
-        }
-        
-        // 停止NFC扫描
-        function stopNFCScan() {
-            if (ndefReader) {
-                ndefReader.onreading = null;
-                ndefReader.onreadingerror = null;
-                ndefReader = null;
-            }
-            if (adminNdefReader) {
-                adminNdefReader.onreading = null;
-                adminNdefReader.onreadingerror = null;
-                adminNdefReader = null;
-            }
-            document.getElementById('nfcButton').disabled = false;
-        }
-        
-        // 测试卡片（模拟NFC扫描）
-        function testCard(cardId) {
-            document.getElementById('manualCardId').value = cardId;
-            stopNFCScan();
-            processNFCCard(cardId);
-        }
-        
-        // 处理NFC卡片数据
-        function processNFCCard(cardId) {
-            const nfcStatus = document.getElementById('nfcStatus');
-            const cardInfo = document.getElementById('cardInfo');
-            resetAllStatus();
-            document.getElementById('nfcButton').disabled = false;
-            loadingProgress.style.width = '25%';
-            
-            // 检查是否是管理员密钥
-            if (cardId === ADMIN_KEY) {
-                nfcStatus.textContent = '🔑 管理员密钥已验证';
-                nfcStatus.style.color = '#9c27b0';
-                cardInfo.innerHTML = '此密钥用于后台管理验证';
-                cardInfo.style.color = '#9c27b0';
-                loadingProgress.style.width = '100%';
-                return;
-            }
-            
-            // 空白卡处理
-            if (!cardId || cardId.trim() === '') {
-                nfcStatus.textContent = '❌ 读取到空白标签';
-                nfcStatus.style.color = '#f44336';
-                cardInfo.innerHTML = '标签中没有存储文本数据';
-                cardInfo.style.color = '#f44336';
-                document.getElementById('cardIdStatus').textContent = '空白标签';
-                document.getElementById('cardIdStatus').className = 'value unauthorized';
-                document.getElementById('idNumberStatus').textContent = 'N/A';
-                document.getElementById('idNumberStatus').className = 'value unauthorized';
-                showUnauthorizedStatus();
-                return;
-            }
-            
-            // 普通卡片处理（隐藏具体卡号）
-            document.getElementById('cardIdStatus').textContent = '已验证';
-            document.getElementById('cardIdStatus').className = 'value verified';
-            document.getElementById('idNumberStatus').textContent = '***';
-            document.getElementById('idNumberStatus').className = 'value verified';
-            
-            // 已授权卡片
-            if (nfcCards[cardId]) {
-                const cardData = nfcCards[cardId];
-                nfcStatus.textContent = '✅ 卡片验证成功';
-                nfcStatus.style.color = '#4caf50';
-                cardInfo.innerHTML = `身份类型: ${cardData.type}`;
-                cardInfo.style.color = '#4caf50';
-                
-                // 逐步显示认证信息
-                setTimeout(() => {
-                    document.getElementById('nameStatus').textContent = cardData.name;
-                    document.getElementById('nameStatus').className = 'value verified';
-                    loadingProgress.style.width = '40%';
-                }, 500);
-                setTimeout(() => {
-                    document.getElementById('affiliationStatus').textContent = cardData.affiliation;
-                    document.getElementById('affiliationStatus').className = 'value verified';
-                    loadingProgress.style.width = '60%';
-                }, 1000);
-                setTimeout(() => {
-                    document.getElementById('levelStatus').textContent = cardData.level;
-                    document.getElementById('levelStatus').className = 'value verified';
-                    loadingProgress.style.width = '80%';
-                }, 1500);
-                setTimeout(() => {
-                    document.getElementById('areaStatus').textContent = cardData.area;
-                    document.getElementById('areaStatus').className = 'value verified';
-                    loadingProgress.style.width = '100%';
-                }, 2000);
-            } else {
-                // 未授权卡片
-                nfcStatus.textContent = '❌ 未知卡片';
-                nfcStatus.style.color = '#f44336';
-                cardInfo.innerHTML = '未授权的卡片';
-                cardInfo.style.color = '#f44336';
-                document.getElementById('idNumberStatus').textContent = 'N/A';
-                document.getElementById('idNumberStatus').className = 'value unauthorized';
-                showUnauthorizedStatus();
-            }
-        }
-        
-        // 显示未授权状态
-        function showUnauthorizedStatus() {
-            setTimeout(() => {
-                document.getElementById('nameStatus').textContent = '未知用户';
-                document.getElementById('nameStatus').className = 'value unauthorized';
-                document.getElementById('affiliationStatus').textContent = '未授权';
-                document.getElementById('affiliationStatus').className = 'value unauthorized';
-                document.getElementById('levelStatus').textContent = 'N/A';
-                document.getElementById('levelStatus').className = 'value unauthorized';
-                document.getElementById('areaStatus').textContent = '访问被拒绝';
-                document.getElementById('areaStatus').className = 'value unauthorized';
-                loadingProgress.style.width = '100%';
-            }, 1000);
-        }
-        
-        // 重置所有状态
-        function resetAllStatus() {
-            document.getElementById('cardIdStatus').textContent = '等待读取';
-            document.getElementById('cardIdStatus').className = 'value checking';
-            document.getElementById('idNumberStatus').textContent = '等待读取';
-            document.getElementById('idNumberStatus').className = 'value checking';
-            document.getElementById('nameStatus').textContent = '等待NFC验证';
-            document.getElementById('nameStatus').className = 'value checking';
-            document.getElementById('affiliationStatus').textContent = '等待NFC验证';
-            document.getElementById('affiliationStatus').className = 'value checking';
-            document.getElementById('levelStatus').textContent = '等待NFC验证';
-            document.getElementById('levelStatus').className = 'value checking';
-            document.getElementById('areaStatus').textContent = '等待NFC验证';
-            document.getElementById('areaStatus').className = 'value checking';
-            loadingProgress.style.width = '0%';
-            
-            // 重置NFC状态显示
-            document.getElementById('nfcStatus').textContent = '等待扫描...';
-            document.getElementById('nfcStatus').style.color = '#ffa726';
-            document.getElementById('cardInfo').innerHTML = '';
-            document.getElementById('nfcError').textContent = '';
-            document.getElementById('manualTestStatus').innerHTML = '';
-        }
     </script>
 </body>
 </html>
