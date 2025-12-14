@@ -5,236 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>身份认证系统 - 联邦沙勒调查局</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            background: linear-gradient(45deg, #00b4db, #0083b0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .nfc-section {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .nfc-button {
-            background: linear-gradient(45deg, #00b4db, #0083b0);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 10px 5px;
-            transition: transform 0.2s;
-        }
-        
-        .nfc-button:hover {
-            transform: scale(1.05);
-        }
-        
-        .nfc-button:disabled {
-            background: #666;
-            cursor: not-allowed;
-        }
-        
-        .manual-test {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-        }
-        
-        .manual-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            margin: 10px 0;
-        }
-        
-        .nfc-status {
-            font-size: 14px;
-            color: #ffa726;
-            margin-top: 10px;
-            min-height: 20px;
-        }
-        
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 16px;
-        }
-        
-        .label {
-            font-weight: bold;
-            color: #cccccc;
-        }
-        
-        .value {
-            font-weight: bold;
-        }
-        
-        .checking {
-            color: #ffa726;
-        }
-        
-        .checking::after {
-            content: '...';
-            animation: dots 1.5s infinite;
-        }
-        
-        .verified {
-            color: #4caf50;
-            position: relative;
-        }
-        
-        .verified::after {
-            content: ' ✓';
-            color: #4caf50;
-            font-weight: bold;
-        }
-        
-        .unauthorized {
-            color: #f44336;
-            position: relative;
-        }
-        
-        .unauthorized::after {
-            content: ' ✗';
-            color: #f44336;
-            font-weight: bold;
-        }
-        
-        .loading-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-        
-        .loading-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #00b4db, #0083b0);
-            border-radius: 2px;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-        
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #888;
-        }
-        
-        .card-info {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #ccc;
-        }
-        
-        .card-id {
-            color: #00b4db;
-            font-family: monospace;
-            background: rgba(0, 180, 219, 0.1);
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-        
-        .test-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin: 10px 0;
-            flex-wrap: wrap;
-        }
-        
-        .test-button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 11px;
-            flex: 1;
-            min-width: 80px;
-            max-width: 120px;
-        }
-        
-        .test-button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .error-message {
-            color: #ff6b6b;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        
-        .admin-section {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Microsoft YaHei',sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:white;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+        .container{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border-radius:15px;padding:30px;width:100%;max-width:500px;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.2)}
+        .header{text-align:center;margin-bottom:30px}
+        .header h1{font-size:24px;margin-bottom:8px;background:linear-gradient(45deg,#00b4db,#0083b0);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .nfc-section{text-align:center;margin-bottom:20px;padding:15px;background:rgba(255,255,255,0.05);border-radius:10px;border:1px solid rgba(255,255,255,0.1)}
+        .nfc-button{background:linear-gradient(45deg,#00b4db,#0083b0);color:white;border:none;padding:12px 24px;border-radius:25px;font-size:16px;cursor:pointer;margin:10px 5px;transition:transform 0.2s}
+        .nfc-button:hover{transform:scale(1.05)}
+        .nfc-button:disabled{background:#666;cursor:not-allowed}
+        .nfc-status{font-size:14px;color:#ffa726;margin-top:10px;min-height:20px}
+        .status-item{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid rgba(255,255,255,0.1);font-size:16px}
+        .label{font-weight:bold;color:#cccccc}
+        .value{font-weight:bold}
+        .checking{color:#ffa726}
+        .checking::after{content:'...';animation:dots 1.5s infinite}
+        .verified{color:#4caf50;position:relative}
+        .verified::after{content:' ✓';color:#4caf50;font-weight:bold}
+        .unauthorized{color:#f44336;position:relative}
+        .unauthorized::after{content:' ✗';color:#f44336;font-weight:bold}
+        .loading-bar{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin:20px 0;overflow:hidden}
+        .loading-progress{height:100%;background:linear-gradient(90deg,#00b4db,#0083b0);border-radius:2px;width:0%;transition:width 0.5s ease}
+        @keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
+        .footer{text-align:center;margin-top:20px;font-size:12px;color:#888}
+        .card-info{background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;margin-top:10px;font-size:12px;color:#ccc}
+        .card-id{color:#00b4db;font-family:monospace;background:rgba(0,180,219,0.1);padding:2px 6px;border-radius:4px}
+        .test-buttons{display:flex;gap:10px;justify-content:center;margin:10px 0;flex-wrap:wrap}
+        .test-button{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white;padding:8px 12px;border-radius:5px;cursor:pointer;font-size:11px;flex:1;min-width:80px;max-width:120px}
+        .test-button:hover{background:rgba(255,255,255,0.2)}
+        .error-message{color:#ff6b6b;font-size:12px;margin-top:5px}
     </style>
 </head>
 <body>
@@ -303,14 +102,14 @@
             <div style="font-size:11px; color:#888; margin-top:5px;">包含：手动测试、创建新卡、查看卡库</div>
         </div>
         
-        <!-- 管理员后台系统界面 -->
-        <div class="admin-section" id="adminSection">
+        <!-- 管理员后台系统界面 (默认隐藏) -->
+        <div class="admin-section" id="adminSection" style="display:none; margin-top:20px; padding:20px; background:rgba(255,255,255,0.05); border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
             <h3 style="text-align:center; margin-bottom:15px; color:#00b4db;">👨‍💼 管理员后台系统</h3>
             
             <!-- 手动测试面板 -->
             <div style="margin-bottom:20px; padding:15px; background:rgba(255,255,255,0.03); border-radius:8px;">
                 <h4 style="color:#ccc; margin-bottom:10px;">🛠️ 手动测试卡片</h4>
-                <input type="text" class="manual-input" id="manualCardId" placeholder="输入卡号进行测试，如：se 710017">
+                <input type="text" class="manual-input" id="manualCardId" placeholder="输入卡号进行测试，如：se 710017" style="width:100%; margin-bottom:10px;">
                 <button class="nfc-button" onclick="manualTest()" style="width:100%; background:linear-gradient(45deg,#9c27b0,#6a1b9a);">执行手动验证</button>
                 <div id="manualTestStatus" style="margin-top:10px; font-size:12px;"></div>
             </div>
@@ -328,32 +127,32 @@
                 <h4 style="color:#ccc; margin-bottom:15px;">✨ 创建新学生档案</h4>
                 <div style="margin-bottom:12px;">
                     <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">卡号 (将写入NFC标签):</label>
-                    <input type="text" class="manual-input" id="newCardId" placeholder="例如：STUDENT-002">
+                    <input type="text" class="manual-input" id="newCardId" placeholder="例如：STUDENT-002" style="font-size:14px;">
                 </div>
                 
                 <div style="margin-bottom:12px;">
                     <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">姓名:</label>
-                    <input type="text" class="manual-input" id="newName" placeholder="例如：学生B：true">
+                    <input type="text" class="manual-input" id="newName" placeholder="例如：学生B：true" style="font-size:14px;">
                 </div>
                 
                 <div style="margin-bottom:12px;">
                     <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">学院:</label>
-                    <input type="text" class="manual-input" id="newAffiliation" placeholder="例如：阿拜多斯高等学院：true">
+                    <input type="text" class="manual-input" id="newAffiliation" placeholder="例如：阿拜多斯高等学院：true" style="font-size:14px;">
                 </div>
                 
                 <div style="margin-bottom:12px;">
                     <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">权限等级:</label>
-                    <input type="text" class="manual-input" id="newLevel" placeholder="例如：R-Std：true">
+                    <input type="text" class="manual-input" id="newLevel" placeholder="例如：R-Std：true" style="font-size:14px;">
                 </div>
                 
                 <div style="margin-bottom:12px;">
                     <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">区域认证:</label>
-                    <input type="text" class="manual-input" id="newArea" placeholder="例如：阿拜多斯">
+                    <input type="text" class="manual-input" id="newArea" placeholder="例如：阿拜多斯" style="font-size:14px;">
                 </div>
                 
                 <div style="margin-bottom:15px;">
                     <label style="display:block; margin-bottom:3px; color:#ccc; font-size:13px;">ID卡号:</label>
-                    <input type="text" class="manual-input" id="newIdNumber" placeholder="例如：ABXY-002">
+                    <input type="text" class="manual-input" id="newIdNumber" placeholder="例如：ABXY-002" style="font-size:14px;">
                 </div>
                 
                 <button class="nfc-button" onclick="saveNewCard()" style="background:linear-gradient(45deg,#4caf50,#2e7d32); width:100%;">
@@ -374,8 +173,7 @@
             <p>最后更新: <span id="timestamp"></span></p>
         </div>
     </div>
-
-    <script>
+        <script>
         // 更新时间戳
         document.getElementById('timestamp').textContent = new Date().toLocaleString('zh-CN');
         
